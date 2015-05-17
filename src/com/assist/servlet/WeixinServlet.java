@@ -13,10 +13,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.dom4j.DocumentException;
 
 import com.assist.message.TextMessage;
+import com.assist.model.DAO;
 import com.assist.model.MyImage;
 import com.assist.util.CheckUtil;
 import com.assist.util.InterfaceUtil;
 import com.assist.util.MessageUtil;
+import com.assist.util.SignatureUrl;
 
 public class WeixinServlet extends HttpServlet {
 	@Override
@@ -30,6 +32,7 @@ public class WeixinServlet extends HttpServlet {
 		PrintWriter out=resp.getWriter();
 		if(CheckUtil.checkSignature(signature, timestamp, nonce)){
 			out.print(echostr);
+			out.print(timestamp);
 		}
 	}
 	
@@ -50,17 +53,59 @@ public class WeixinServlet extends HttpServlet {
 			
 			String message=null;
 			if(MessageUtil.MESSAGE_TEXT.equals(msgType)){
-				if("2012302580279".equals(content)){
-//					message=MessageUtil.initText(toUserName, fromUserName, MessageUtil.firstMenu());
-					message=MessageUtil.initText(toUserName, fromUserName, MessageUtil.courseQuery(content));
+				if("0".equals(content)){
+					DAO d=new DAO();
+					if(d.getStuNumber(fromUserName)==null){
+						message=MessageUtil.initText(toUserName, fromUserName, "未绑定！回复1绑定");
+					}else{
+						MessageUtil.cancleTie(fromUserName);
+						message=MessageUtil.initText(toUserName, fromUserName, "已取消绑定！回复1重新绑定");
+					}
 				}else if("1".equals(content)){
-					message=MessageUtil.initNews(toUserName, fromUserName);
+					DAO d=new DAO();
+					if(d.getStuNumber(fromUserName)!=null){
+						message=MessageUtil.initText(toUserName, fromUserName, "你已绑定！回复0取消绑定");
+					}else{
+						message=MessageUtil.initText(toUserName, fromUserName, MessageUtil.link(fromUserName,Long.toString(new Date().getTime()),SignatureUrl.getSignature(fromUserName, Long.toString(new Date().getTime()))));
+					}
 				}else if("2".equals(content)){
-					message=MessageUtil.initText(toUserName, fromUserName, InterfaceUtil.getAccess_Token());
+					DAO d=new DAO();
+					if(d.getStuNumber(fromUserName)!=null){
+						message=MessageUtil.initText(toUserName, fromUserName, MessageUtil.gradeQuery(d.getStuNumber(fromUserName)));
+					}else{
+						message=MessageUtil.initText(toUserName, fromUserName, "还未绑定，点击"+MessageUtil.link(fromUserName,new String("10"),SignatureUrl.getSignature(fromUserName, new String("10"))));
+					}
+				}else if("3".equals(content)){
+					DAO d=new DAO();
+					if(d.getStuNumber(fromUserName)!=null){
+						message=MessageUtil.initText(toUserName, fromUserName, MessageUtil.courseQuery(d.getStuNumber(fromUserName)));
+					}else{
+						message=MessageUtil.initText(toUserName, fromUserName, "还未绑定，点击"+MessageUtil.link(fromUserName,new String("10"),SignatureUrl.getSignature(fromUserName, new String("10"))));
+					}
+				}else if("4".equals(content)){
+					message=MessageUtil.noticeQuery(toUserName, fromUserName);
+				}else if("5".equals(content)){
+					DAO d=new DAO();
+					if(d.getStuNumber(fromUserName)!=null){
+						message=MessageUtil.initText(toUserName, fromUserName, MessageUtil.testPlanQuery(d.getStuNumber(fromUserName)));
+					}else{
+						message=MessageUtil.initText(toUserName, fromUserName, "还未绑定，点击"+MessageUtil.link(fromUserName,new String("10"),SignatureUrl.getSignature(fromUserName, new String("10"))));
+					}
+				}else if("6".equals(content)){
+					message=MessageUtil.initText(toUserName, fromUserName, MessageUtil.publicCourseQuery());
+				}else if("7".equals(content)){
+					DAO d=new DAO();
+					if(d.getStuNumber(fromUserName)!=null){
+						message=MessageUtil.initText(toUserName, fromUserName, MessageUtil.privatepublicCourseQuery(d.getStuNumber(fromUserName)));
+					}else{
+						message=MessageUtil.initText(toUserName, fromUserName, "还未绑定，点击"+MessageUtil.link(fromUserName,new String("10"),SignatureUrl.getSignature(fromUserName, new String("10"))));
+					}
+				}else if("8".equals(content)){
+					message=MessageUtil.initText(toUserName, fromUserName, "开发中...");
+				}else if("9".equals(content)){
+					message=MessageUtil.initText(toUserName, fromUserName, MessageUtil.games());
 				}else if("?".equals(content)||"？".equals(content)){
 					message=MessageUtil.initText(toUserName, fromUserName, MessageUtil.menuText());
-				}else if("2012302580279成绩".equals(content)){
-					message=MessageUtil.initText(toUserName, fromUserName, MessageUtil.gradeQuery(content.substring(0, 13)));	
 				}else if("test".equals(content)){
 					System.out.println(InterfaceUtil.getAccess_Token()+"\n");
 					System.out.println(InterfaceUtil.getMenu(InterfaceUtil.getAccess_Token()));

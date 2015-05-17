@@ -11,6 +11,15 @@ public class Course {
 	private int CreditHours;
 	private String ClassTime;
 	private String Comment;
+	private String DateOfTest;
+	private String StartTimeOfTest;
+	private String EndTimeOfTest;
+	private String ClassroomOfTest;
+	private String AddressOfTest;
+	private String MajorTestTeacher;
+	private String OtherTestTeacher;
+	
+	
 	public String getCourseNumber() {
 		return CourseNumber;
 	}
@@ -71,6 +80,48 @@ public class Course {
 	public void setComment(String comment) {
 		Comment = comment;
 	}
+	public String getDateOfTest() {
+		return DateOfTest;
+	}
+	public void setDateOfTest(String dateOfTest) {
+		DateOfTest = dateOfTest;
+	}
+	public String getStartTimeOfTest() {
+		return StartTimeOfTest;
+	}
+	public void setStartTimeOfTest(String startTimeOfTest) {
+		StartTimeOfTest = startTimeOfTest;
+	}
+	public String getEndTimeOfTest() {
+		return EndTimeOfTest;
+	}
+	public void setEndTimeOfTest(String endTimeOfTest) {
+		EndTimeOfTest = endTimeOfTest;
+	}
+	public String getClassroomOfTest() {
+		return ClassroomOfTest;
+	}
+	public void setClassroomOfTest(String classroomOfTest) {
+		ClassroomOfTest = classroomOfTest;
+	}
+	public String getAddressOfTest() {
+		return AddressOfTest;
+	}
+	public void setAddressOfTest(String addressOfTest) {
+		AddressOfTest = addressOfTest;
+	}
+	public String getMajorTestTeacher() {
+		return MajorTestTeacher;
+	}
+	public void setMajorTestTeacher(String majorTestTeacher) {
+		MajorTestTeacher = majorTestTeacher;
+	}
+	public String getOtherTestTeacher() {
+		return OtherTestTeacher;
+	}
+	public void setOtherTestTeacher(String otherTestTeacher) {
+		OtherTestTeacher = otherTestTeacher;
+	}
 	@Override
 	public String toString() {
 		return "Course [CourseNumber=" + CourseNumber + ", CourseName="
@@ -78,6 +129,11 @@ public class Course {
 				+ ", CourseCollege=" + CourseCollege + ", TeacherName="
 				+ TeacherName + ", CourseMajor=" + CourseMajor + ", Credit="
 				+ Credit + ", CreditHours=" + CreditHours + ", ClassTime="
-				+ ClassTime + ", Comment=" + Comment + "]";
+				+ ClassTime + ", Comment=" + Comment + ", DateOfTest="
+				+ DateOfTest + ", StartTimeOfTest=" + StartTimeOfTest
+				+ ", EndTimeOfTest=" + EndTimeOfTest + ", ClassroomOfTest="
+				+ ClassroomOfTest + ", AddressOfTest=" + AddressOfTest
+				+ ", MajorTestTeacher=" + MajorTestTeacher
+				+ ", OtherTestTeacher=" + OtherTestTeacher + "]";
 	}
 }

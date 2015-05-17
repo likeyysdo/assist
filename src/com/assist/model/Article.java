@@ -5,7 +5,9 @@ public class Article {
 	private String Description;
 	private String PicUrl;
 	private String Url;
-	
+	public Article(){
+		
+	}
 	public Article(String Title,String Description,String PicUrl,String Url){
 		this.Title=Title;
 		this.Description=Description;

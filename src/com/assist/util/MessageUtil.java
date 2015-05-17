@@ -2,10 +2,13 @@ package com.assist.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -168,6 +171,31 @@ public class MessageUtil {
 		
 		return newsMessageToXml(news);
 	}
+	
+    /**
+     * 教务系统版图文消息回复
+     * @param toUserName
+     * @param fromUserName
+     * @return
+     */
+    public static String initNews2(String toUserName,String fromUserName,List<Article> a){
+		
+		NewsMessageResponse news=new NewsMessageResponse();
+		List<Article> addlist=new ArrayList<Article>();
+		for(Article article:a){
+			Article item=new Article(article.getTitle(),article.getDescription(), 
+					article.getPicUrl(),article.getUrl());
+			addlist.add(item);
+		}
+		news.setFromUserName(toUserName);
+		news.setToUserName(fromUserName);
+		news.setMsgType(MessageUtil.MESSAGE_NEWS);
+		news.setCreateTime(123);
+		news.setArticleCount(3);
+		news.setAddlist(addlist);
+		
+		return newsMessageToXml(news);
+	}
 	/**
 	 * 
 	 * @return
@@ -178,7 +206,7 @@ public class MessageUtil {
 		return sb.toString();
 	}
 	/**
-	 * 课程查询
+	 * 课表查询
 	 * @param StuNumber
 	 * @return
 	 * @throws Exception
@@ -188,11 +216,45 @@ public class MessageUtil {
 		List<Course> c=d.query(StuNumber);
 		StringBuffer sb=new StringBuffer();
 		for(Course course:c){
-			System.out.println(course.getCourseName());
-			sb.append(course.getCourseName()+"\n");
+			sb.append(course.getClassTime()+",");
+			sb.append(course.getCourseName()+",");
+			sb.append(course.getCourseType()+",");
+			sb.append(course.getCourseCollege()+",");
+			sb.append(course.getTeacherName()+",");
+			sb.append(course.getCredit()+"学分,");
+			sb.append(course.getCreditHours()+"学时\n\n");
+			
 		}
 		return sb.toString();
 	}
+	/**
+	 * 考试安排查询
+	 * @param StuNumber
+	 * @return
+	 * @throws Exception
+	 */
+	public static String testPlanQuery(String StuNumber) throws Exception{
+		DAO d=new DAO();
+		List<Course> c=d.queryTestPlan(StuNumber);
+		StringBuffer sb=new StringBuffer();
+		for(Course course:c){
+			sb.append(course.getCourseName()+",");
+			sb.append(course.getCourseType()+",");
+			sb.append(course.getCourseCollege()+",");
+			sb.append(course.getTeacherName()+",");
+			sb.append(course.getCredit()+"学分,");
+			sb.append("考试时间："+course.getDateOfTest()+" "+course.getStartTimeOfTest()+"~"+course.getEndTimeOfTest()+",");
+			sb.append("考试地点："+course.getAddressOfTest()+" "+course.getClassroomOfTest()+",");
+			sb.append("主监考老师："+course.getMajorTestTeacher()+"&副监考老师："+course.getOtherTestTeacher()+"\n\n");
+		}
+		return sb.toString();
+	}
+	/**
+	 * 成绩查询
+	 * @param StuNumber
+	 * @return
+	 * @throws Exception
+	 */
 	public static String gradeQuery(String StuNumber) throws Exception{
 		DAO d=new DAO();
 		List<Grade> g=d.query2(StuNumber);
@@ -203,15 +265,88 @@ public class MessageUtil {
 		}
 		return sb.toString();
 	}
+	
+	
 	/**
+	 * 教务系统通知查询
+	 * @param toUserName
+	 * @param fromUserName
+	 * @return
+	 * @throws Exception
+	 */
+	public static String noticeQuery(String toUserName,String fromUserName) throws Exception{
+		DAO d=new DAO();
+		List<Article> a=d.queryNotice();
+		return initNews2(toUserName,fromUserName,a);
+	}
+	/**
+	 * 本学期所开公选课查询
+	 * @return
+	 * @throws Exception 
+	 */
+	public static String publicCourseQuery() throws Exception{
+		DAO d=new DAO();
+		List<Course> c=d.queryPublicCourse();
+		StringBuffer sb=new StringBuffer();
+		for(Course course:c){
+			sb.append(course.getCourseName()+",");
+			sb.append(course.getCourseCollege()+",");
+			sb.append(course.getTeacherName()+",");
+			sb.append(course.getCredit()+"学分,");
+			sb.append(course.getCreditHours()+"学时,");
+			sb.append(course.getClassTime()+"\n\n");
+		}
+		return sb.toString();
+		
+	}
+	/**
+	 * 已选公选课查询
+	 * @param StuNumber
+	 * @return
+	 * @throws Exception 
+	 */
+	public static String privatepublicCourseQuery(String StuNumber) throws Exception{
+		DAO d=new DAO();
+		List<Course> c=d.queryPrivatePublicCourse(StuNumber);
+		StringBuffer sb=new StringBuffer();
+		for(Course course:c){
+			sb.append(course.getClassTime()+",");
+			sb.append(course.getCourseName()+",");
+			sb.append(course.getCourseCollege()+",");
+			sb.append(course.getTeacherName()+",");
+			sb.append(course.getCredit()+"学分,");
+			sb.append(course.getCreditHours()+"学时,");
+			sb.append(course.getClassTime()+"\n\n");
+		}
+		return sb.toString();
+		
+		
+	}
+	/**
+	 * 自习教室查询
 	 * @return
 	 */
-	public static String secondMenu(){
+	public static String studyClassQuery(){
+		return null;
+		
+	}
+	public static void cancleTie(String openid){
+		DAO d = new DAO();
+		try {
+			d.delTie(openid);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	public static String games(){
 		StringBuffer sb=new StringBuffer();
-		sb.append("你是傻逼");
+		sb.append("<a href=\"http://pictoword.hortorgame.com");
+		sb.append("\">疯狂猜图</a>");
+		sb.append("\n");  
+		sb.append("<a href=\"http://2000140264.zhan.qq.com/?t=1430825330");
+		sb.append("\">我的简历</a>");
 		return sb.toString();
 	}
-	
 	/**
 	 * 主菜单
 	 * @return
@@ -219,9 +354,57 @@ public class MessageUtil {
 	public static String menuText(){
 		StringBuffer sb=new StringBuffer();
 		sb.append("欢迎关注，按以下提示操作\n\n");
-		sb.append("1.阿常\n");
-		sb.append("2.汪汪汪\n\n");
+		sb.append("1.一键绑定\n");
+		sb.append("2.成绩查询\n");
+		sb.append("3.课表查询\n");
+		sb.append("4.教务通知查询\n");
+		sb.append("5.考试安排查询\n");
+		sb.append("6.本学期所开公选课查询\n");
+		sb.append("7.已选公选课查询\n");
+		sb.append("8.自习教室查询\n");
+		sb.append("9.小游戏\n\n");
 		sb.append("回复？显示该菜单");
 		return sb.toString();
 	}
+	public static String link(String fromUserName,String timestamp,String signature){
+		StringBuffer sb=new StringBuffer();
+		sb.append("<a href=\"http://assist.tunnel.mobi/Assist/login.jsp?openid=");
+		sb.append(fromUserName);
+		sb.append("&timestamp=");
+		sb.append(timestamp);
+		sb.append("&signature=");
+		sb.append(signature);
+		sb.append("\">一键绑定</a>");
+		return sb.toString();
+	}
+	public static String link1(){
+		StringBuffer sb=new StringBuffer();
+		sb.append("<a href=\"http://pictoword.hortorgame.com");
+		sb.append("\">疯狂猜图</a>");
+		
+		return sb.toString();
+	}
+	/**
+	 * 学分计算
+	 * @param map<score,credit>
+	 * @return average credit
+	 */
+	public static double CreditCalcu(Map<Integer, Integer> map) {
+		double value = 0;
+		int sumCredit = 0;
+		Set set = map.entrySet();  
+        Iterator iterator =set.iterator();   
+        while (iterator.hasNext())  
+      {   
+          Map.Entry mapentry= (Map.Entry)iterator.next();  
+		
+          value += (double)((((double)mapentry.getKey() - 60)/10)*(double)(mapentry.getValue()));
+          sumCredit += (Integer)mapentry.getValue();        
+      }
+        value = value/ (double)sumCredit;
+       System.out.println(value);
+	   return value;
+        
+	}
 }
+

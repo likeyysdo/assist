@@ -17,31 +17,24 @@ import java.util.Map;
 
 import com.assist.util.DBUtil;
 
-
+	
 	public class DAO{
 		
-//		public void addGoddess(Goddess g) throws SQLException{
-//			Connection conn=DBUtil.getConnection();
-//			String sql=""+
-//					"insert into imooc_goddess"+
-//					"(user_name,sex,age,birthday,email,mobile,"+
-//					"create_user,create_date,update_user,update_date,isdel)" +
-//					" values("+
-//					"?,?,?,?,?,?,?,current_date(),?,current_date(),?)";
-//			PreparedStatement ptmt=conn.prepareStatement(sql);
-//			
-//			ptmt.setString(1,g.getUser_name());
-//			ptmt.setInt(2,g.getSex());
-//			ptmt.setInt(3,g.getAge());
-//			ptmt.setDate(4, new Date(g.getBirthday().getTime()));
-//			ptmt.setString(5,g.getEmail());
-//			ptmt.setString(6,g.getMobile());
-//			ptmt.setString(7, g.getCreate_user());
-//			ptmt.setString(8,g.getUpdate_user());
-//			ptmt.setInt(9, g.getIsdel());
-//			
-//			ptmt.execute();
-//		}
+		
+		public void addopenid(String openid,String StuNumber) throws SQLException{
+			Connection conn=DBUtil.getConnection();
+			String sql=""+
+					"insert into so"+
+					"(openId,StuNumber)" +
+					" values("+
+					"?,?)";
+			PreparedStatement ptmt=conn.prepareStatement(sql);
+			
+			ptmt.setString(1,openid);
+			ptmt.setString(2,StuNumber);
+			
+			ptmt.execute();
+		}
 		
 //		public void updateGoddess(Goddess g) throws SQLException{
 //			Connection conn=DBUtil.getConnection();
@@ -66,18 +59,55 @@ import com.assist.util.DBUtil;
 //			ptmt.execute();
 //		}
 		
-//		public void delGoddess(Integer id) throws SQLException{
-//			Connection conn=DBUtil.getConnection();
-//			String sql=""+
-//					"delete from imooc_goddess"
-//					+" where id=?";
-//			PreparedStatement ptmt=conn.prepareStatement(sql);
-//			
-//			ptmt.setInt(1,id);
-//			
-//			ptmt.execute();
-//		}
-		
+		/**
+		 * 解除绑定
+		 * @param openid
+		 * @throws SQLException
+		 */
+		public void delTie(String openid) throws SQLException{
+			Connection conn=DBUtil.getConnection();
+			String sql="delete from so where openid=?";
+			PreparedStatement ptmt=conn.prepareStatement(sql);
+			
+			ptmt.setString(1,openid);
+			
+			ptmt.execute();
+		}
+		/**
+		 * 所开公选课查询
+		 * @param StuNumber
+		 * @return
+		 * @throws Exception
+		 */
+		public List<Course> queryPublicCourse() throws Exception{
+			List<Course> result=new ArrayList<Course>();
+			
+			Connection conn=DBUtil.getConnection();
+			StringBuilder sb=new StringBuilder();
+			sb.append("select * from PublicElective");
+//			Statement stmt=conn.createStatement();
+			PreparedStatement ptmt=conn.prepareStatement(sb.toString());
+			ResultSet rs=ptmt.executeQuery();
+
+			Course c=null;
+			while(rs.next()){
+				c=new Course();
+				c.setCourseName(rs.getString("CourseName"));
+				c.setCourseCollege(rs.getString("CourseCollege"));
+				c.setTeacherName(rs.getString("TeacherName"));
+				c.setCredit(rs.getInt("Credit"));
+				c.setCreditHours(rs.getInt("CreditHours"));
+				c.setClassTime(rs.getString("ClassTime"));
+				result.add(c);
+			}
+			return result;
+		}
+		/**
+		 * 课表查询
+		 * @param StuNumber
+		 * @return
+		 * @throws Exception
+		 */
 		public List<Course> query(String StuNumber) throws Exception{
 			List<Course> result=new ArrayList<Course>();
 			
@@ -94,13 +124,77 @@ import com.assist.util.DBUtil;
 				c=new Course();
 				c.setCourseNumber(rs.getString("CourseNumber"));
 				c.setCourseName(rs.getString("CourseName"));
-				
+				c.setCourseType(rs.getString("CourseType"));
+				c.setCourseCollege(rs.getString("CourseCollege"));
+				c.setTeacherName(rs.getString("TeacherName"));
+				c.setCredit(rs.getInt("Credit"));
+				c.setCreditHours(rs.getInt("CreditHours"));
+				c.setClassTime(rs.getString("ClassTime"));
 				result.add(c);
 			}
 			return result;
 		}
 		/**
-		 * ��ѯ�ɼ�
+		 * 已选公选课查询
+		 * @param StuNumber
+		 * @return
+		 * @throws Exception
+		 */
+		public List<Course> queryPrivatePublicCourse(String StuNumber) throws Exception{
+			List<Course> result=new ArrayList<Course>();
+			
+			Connection conn=DBUtil.getConnection();
+			StringBuilder sb=new StringBuilder();
+			sb.append("select c.* from SC s_c,Course c where s_c.CourseNumber=c.CourseNumber and c.CourseType='公共选修' and s_c.StuNumber=?;");
+//			Statement stmt=conn.createStatement();
+			PreparedStatement ptmt=conn.prepareStatement(sb.toString());
+			ptmt.setString(1,StuNumber);
+			ResultSet rs=ptmt.executeQuery();
+
+			Course c=null;
+			while(rs.next()){
+				c=new Course();
+				c.setCourseNumber(rs.getString("CourseNumber"));
+				c.setCourseName(rs.getString("CourseName"));
+				c.setCourseType(rs.getString("CourseType"));
+				c.setCourseCollege(rs.getString("CourseCollege"));
+				c.setTeacherName(rs.getString("TeacherName"));
+				c.setCredit(rs.getInt("Credit"));
+				c.setCreditHours(rs.getInt("CreditHours"));
+				c.setClassTime(rs.getString("ClassTime"));
+				result.add(c);
+			}
+			return result;
+		}
+		/**
+		 * 教务通知查询
+		 * @param notice_id
+		 * @return
+		 * @throws Exception
+		 */
+		public List<Article> queryNotice() throws Exception{
+			List<Article> result=new ArrayList<Article>();
+			
+			Connection conn=DBUtil.getConnection();
+			StringBuilder sb=new StringBuilder();
+			sb.append("select * from notice;");
+//			Statement stmt=conn.createStatement();
+			PreparedStatement ptmt=conn.prepareStatement(sb.toString());
+			ResultSet rs=ptmt.executeQuery();
+
+			Article a=null;
+			while(rs.next()){
+				a=new Article();
+				a.setTitle(rs.getString("title"));
+				a.setDescription(rs.getString("description"));
+				a.setPicUrl(rs.getString("picurl"));
+				a.setUrl(rs.getString("url"));
+				result.add(a);
+			}
+			return result;
+		}
+		/**
+		 * 成绩查询
 		 * @param StuNumber
 		 * @return
 		 * @throws Exception
@@ -127,116 +221,66 @@ import com.assist.util.DBUtil;
 			}
 			return result;
 		}
+		public List<Course> queryTestPlan(String StuNumber) throws Exception{
+			List<Course> result=new ArrayList<Course>();
+			
+			Connection conn=DBUtil.getConnection();
+			StringBuilder sb=new StringBuilder();
+			sb.append("select c.* from SC s_c,Course c where s_c.CourseNumber=c.CourseNumber and s_c.StuNumber=?;");
+//			Statement stmt=conn.createStatement();
+			PreparedStatement ptmt=conn.prepareStatement(sb.toString());
+			ptmt.setString(1,StuNumber);
+			ResultSet rs=ptmt.executeQuery();
+
+			Course c=null;
+			while(rs.next()){
+				c=new Course();
+				c.setCourseName(rs.getString("CourseName"));
+				c.setCourseType(rs.getString("CourseType"));
+				c.setCourseCollege(rs.getString("CourseCollege"));
+				c.setTeacherName(rs.getString("TeacherName"));
+				c.setCredit(rs.getInt("Credit"));
+				c.setDateOfTest(rs.getString("DateOfTest"));
+				c.setStartTimeOfTest(rs.getString("StartTimeOfTest"));
+				c.setEndTimeOfTest(rs.getString("EndTimeOfTest"));
+				c.setClassroomOfTest(rs.getString("ClassroomOfTest"));
+				c.setAddressOfTest(rs.getString("AddressOfTest"));
+				c.setMajorTestTeacher(rs.getString("MajorTestTeacher"));
+				c.setOtherTestTeacher(rs.getString("OtherTestTeacher"));
+				result.add(c);
+			}
+			return result;
+		}
+		public String getPassword(String StuNumber) throws SQLException{
+			Connection conn=DBUtil.getConnection();
+			String sql="select password from sp where StuNumber=?";
+			
+			PreparedStatement ptmt=conn.prepareStatement(sql);
+			
+			ptmt.setString(1,StuNumber);
+			
+			ResultSet rs=ptmt.executeQuery();
+			
+			String password=null;
+			while(rs.next()){
+				password=rs.getString("password");
+			}
+			return password;
+		}
+		public String getStuNumber(String openid) throws SQLException{
+			Connection conn=DBUtil.getConnection();
+			String sql="select StuNumber from so where openid=?";
+			
+			PreparedStatement ptmt=conn.prepareStatement(sql);
+			
+			ptmt.setString(1,openid);
+			
+			ResultSet rs=ptmt.executeQuery();		
+			String StuNumber=null;
+			while(rs.next()){
+				StuNumber=rs.getString("StuNumber");
+			}
+			return StuNumber;
+		}
 		
-//		public Goddess get(Integer id) throws SQLException{
-//			Connection conn=DBUtil.getConnection();
-//			String sql=""+"select *"+
-////					"user_name,sex,age,birthday,email,mobile"+
-//////					",create_user,create_date,update_user,update_date,isdel"+
-//					" from imooc_goddess "+
-//					"where id=?";
-//			
-//			PreparedStatement ptmt=conn.prepareStatement(sql);
-//			
-//			ptmt.setInt(1,id);
-////			ptmt.executeQuery();
-//			
-//			ResultSet rs=ptmt.executeQuery();
-////			
-//			Goddess g=null;
-//			while(rs.next()){
-//				g=new Goddess();
-//				g.setId(rs.getInt("id"));
-//				g.setUser_name(rs.getString("user_name"));
-//				g.setSex(rs.getInt("sex"));
-//				g.setAge(rs.getInt("age"));
-//				g.setBirthday(rs.getDate("birthday"));
-//				g.setEmail(rs.getString("email"));
-//				g.setMobile(rs.getString("mobile"));
-//				g.setCreate_user(rs.getString("create_user"));
-//				g.setCreate_date(rs.getDate("create_date"));
-//				g.setUpdate_user(rs.getString("update_user"));
-//				g.setUpdate_date(rs.getDate("update_date"));
-//				g.setIsdel(rs.getInt("isdel"));
-//				
-//			}
-//			return g;
-//		}
-		
-//		public List<Goddess> query(String name,String mobile,String email) throws Exception{
-//			List<Goddess> result=new ArrayList<Goddess>();
-//			
-//			Connection conn=DBUtil.getConnection();
-//			StringBuilder sb=new StringBuilder();
-//			sb.append("select * from imooc_goddess");
-//			
-//			sb.append(" where user_name like ? and mobile like ? and email like ?");
-////			Statement stmt=conn.createStatement();
-//			PreparedStatement ptmt=conn.prepareStatement(sb.toString());
-//			ptmt.setString(1,"%"+name+"%");
-//			ptmt.setString(2,"%"+mobile+"%");
-//			ptmt.setString(3,"%"+email+"%");
-//			
-//			ResultSet rs=ptmt.executeQuery();
-//
-//			Goddess g=null;
-//			while(rs.next()){
-//				g=new Goddess();
-//				g.setId(rs.getInt("id"));
-//				g.setUser_name(rs.getString("user_name"));
-//				g.setSex(rs.getInt("sex"));
-//				g.setAge(rs.getInt("age"));
-//				g.setBirthday(rs.getDate("birthday"));
-//				g.setEmail(rs.getString("email"));
-//				g.setMobile(rs.getString("mobile"));
-//				g.setCreate_user(rs.getString("create_user"));
-//				g.setCreate_date(rs.getDate("create_date"));
-//				g.setUpdate_user(rs.getString("update_user"));
-//				g.setUpdate_date(rs.getDate("update_date"));
-//				g.setIsdel(rs.getInt("isdel"));
-//				
-//				result.add(g);
-//			}
-//			return result;
-//		}
-		
-//		public List<Goddess> query(List<Map<String,Object>> params) throws Exception{
-//			List<Goddess> result=new ArrayList<Goddess>();
-//			
-//			Connection conn=DBUtil.getConnection();
-//			StringBuilder sb=new StringBuilder();
-//			sb.append("select * from imooc_goddess where 1=0");//ʹ��and��ѯʱ1=1��or��ѯʱ1=0��
-//			
-//			if(params!=null&&params.size()>0){
-//				for(int i=0;i<params.size();i++){
-//					Map<String,Object> map=params.get(i);
-//					sb.append(" or "+map.get("name")+" "+map.get("rela")+" "+map.get("value")+" ");
-//				}
-//			}
-////			Statement stmt=conn.createStatement();
-//			PreparedStatement ptmt=conn.prepareStatement(sb.toString());
-//			
-//			
-//			ResultSet rs=ptmt.executeQuery();
-//
-//			Goddess g=null;
-//			while(rs.next()){
-//				g=new Goddess();
-//				g.setId(rs.getInt("id"));
-//				g.setUser_name(rs.getString("user_name"));
-//				g.setSex(rs.getInt("sex"));
-//				g.setAge(rs.getInt("age"));
-//				g.setBirthday(rs.getDate("birthday"));
-//				g.setEmail(rs.getString("email"));
-//				g.setMobile(rs.getString("mobile"));
-//				g.setCreate_user(rs.getString("create_user"));
-//				g.setCreate_date(rs.getDate("create_date"));
-//				g.setUpdate_user(rs.getString("update_user"));
-//				g.setUpdate_date(rs.getDate("update_date"));
-//				g.setIsdel(rs.getInt("id"));
-//				
-//				result.add(g);
-//			}
-//			return result;
-//		}
 }

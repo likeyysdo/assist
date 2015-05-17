@@ -5,14 +5,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
-/**
- * @author fang
- * 检查类
- */
-public class CheckUtil {
-	private static final String token="assist";
-	public static boolean checkSignature(String signature,String timestamp,String nonce){
-		String[] arr=new String[]{token,timestamp,nonce};
+public class SignatureUrl {
+	private static final String token2="fangchen123";
+	public static String getSignature(String openid,String timestamp){
+		String[] arr=new String[]{token2,timestamp,openid};
 		//排序
 		Arrays.sort(arr);
 		
@@ -23,9 +19,9 @@ public class CheckUtil {
 		}
 		
 		//sha1加密
-		String temp=getSha1(content.toString());
+		String signature=getSha1(content.toString());
 		
-		return temp.equals(signature);
+		return signature;
 	}
 	
 	public static String getSha1(String str){
