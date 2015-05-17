@@ -3,6 +3,7 @@
 	<name>Assist</name>
 	<comment></comment>
 	<projects>
+		<project>AssitDatabase</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
